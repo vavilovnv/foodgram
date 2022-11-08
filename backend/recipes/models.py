@@ -90,6 +90,7 @@ class Recipe(models.Model):
                 message='Время приготовления должно быть более минуты.'
             ),
         ),
+        verbose_name='Время приготовления',
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -125,6 +126,7 @@ class IngredientsAmount(models.Model):
                 message='Количество не может быть меньше единицы.'
             ),
         ),
+        verbose_name='Количество',
     )
 
     class Meta:

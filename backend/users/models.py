@@ -3,6 +3,7 @@ from django.db import models
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """Класс описывающий пользователя."""
 
     objects = UserManager()
 
@@ -36,3 +37,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+
+class Follow(models.Model):
+    """Класс описывающий подписку пользователя на автора рецептов."""
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Автор',
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик',
+    )
+
+    class Meta:
+        verbose_name = 'Подписка на пользователя'
+        verbose_name_plural = 'Подписки на пользователя'
+        constraints = (
+            models.UniqueConstraint(
+                fields=['author', 'user'],
+                name='unique follow'
+            ),
+        )

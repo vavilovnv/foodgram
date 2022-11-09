@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Ingredient, IngredientsAmount, Recipe, Tag
+from .models import Ingredient, IngredientAmount, Favorite, Recipe, ShoppingList, Tag
 
 
 @admin.register(Ingredient)
@@ -11,8 +11,8 @@ class IngredientAdmin(admin.ModelAdmin):
     empty_value_display = 'пусто'
 
 
-@admin.register(IngredientsAmount)
-class IngredientsAmountAdmin(admin.ModelAdmin):
+@admin.register(IngredientAmount)
+class IngredientAmountAdmin(admin.ModelAdmin):
     list_display = 'id', 'ingredient', 'recipe', 'amount',
     empty_value_display = 'пусто'
 
@@ -37,3 +37,15 @@ class RecipeAdmin(admin.ModelAdmin):
     @staticmethod
     def amount_tags(obj):
         return '\n'.join(list(obj.tags.values_list('name', flat=True)))
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = 'id', 'user', 'recipe',
+    empty_value_display = 'пусто'
+
+
+@admin.register(ShoppingList)
+class ShoppingListAdmin(admin.ModelAdmin):
+    list_display = 'id', 'user', 'recipe',
+    empty_value_display = 'пусто'

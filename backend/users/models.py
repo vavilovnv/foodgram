@@ -10,7 +10,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         max_length=150,
         unique=True,
-        blank=False,
         verbose_name='Имя пользователя',
     )
     first_name = models.CharField(
@@ -24,15 +23,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         max_length=254,
         unique=True,
-        blank=False,
         verbose_name='E-mail',
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'Пользователь'

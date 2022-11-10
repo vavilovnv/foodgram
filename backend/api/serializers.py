@@ -35,7 +35,7 @@ class CustomUserSerializer(UserSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Follow.objects.filter(autor=obj.id, user=user).exists()
+        return Follow.objects.filter(author=obj.id, user=user).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -163,7 +163,8 @@ class RecipeListSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = '__all__'
 
-    def get_ingredients(self, obj):
+    @staticmethod
+    def get_ingredients(obj):
         queryset = IngredientAmount.objects.filter(recipe=obj)
         return IngredientAmountSerializer(queryset, many=True).data
 
@@ -173,7 +174,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
             return False
         return Favorite.objects.filter(recipe=obj, user=request.user).data
 
-    def get_is_shopping_list(self, obj):
+    def get_is_in_shopping_list(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
@@ -228,38 +229,38 @@ class RecipeSerializer(serializers.ModelSerializer):
                 {'cooking_time': 'Время приготовления должно быть больше 0.'}
             )
 
-        @staticmethod
-        def create_ingredients(recipe, ingredients):
-            bulk_list = [IngredientAmount(
-                recipe=recipe,
-                ingredient=ingredient['id'],
-                amount=ingredient['amount']
-            ) for ingredient in ingredients]
-            IngredientAmount.objects.bulk_create(bulk_list)
+    @staticmethod
+    def create_ingredients(recipe, ingredients):
+        bulk_list = [IngredientAmount(
+            recipe=recipe,
+            ingredient=ing['id'],
+            amount=ing['amount']
+        ) for ing in ingredients]
+        IngredientAmount.objects.bulk_create(bulk_list)
 
-        @staticmethod
-        def create_tags(recipe, tags):
-            for tag in tags:
-                recipe.tags.add(tag)
+    @staticmethod
+    def create_tags(recipe, tags):
+        for tag in tags:
+            recipe.tags.add(tag)
 
-        def create(self, validated_data):
-            author = self.context.get('request').user
-            recipe = Recipe.objects.create(author=author, **validated_data)
-            self.create_tags(recipe, validated_data.pop('tags'))
-            self.create_ingredients(recipe, validated_data.pop('ingredients'))
-            return recipe
+    def create(self, validated_data):
+        author = self.context.get('request').user
+        recipe = Recipe.objects.create(author=author, **validated_data)
+        self.create_tags(recipe, validated_data.pop('tags'))
+        self.create_ingredients(recipe, validated_data.pop('ingredients'))
+        return recipe
 
-        def update(self, recipe, validated_data):
-            recipe.tags.clear()
-            IngredientAmount.objects.filter(recipe=recipe).delete()
-            self.create_tags(recipe, validated_data.pop('tags'))
-            self.create_ingredients(recipe, validated_data.pop('ingredients'))
-            return super().update(recipe, validated_data)
+    def update(self, recipe, validated_data):
+        recipe.tags.clear()
+        IngredientAmount.objects.filter(recipe=recipe).delete()
+        self.create_tags(recipe, validated_data.pop('tags'))
+        self.create_ingredients(recipe, validated_data.pop('ingredients'))
+        return super().update(recipe, validated_data)
 
-        def to_representation(self, instance):
-            request = self.context.get('request')
-            context = {'request': request}
-            return RecipeListSerializer(instance, context=context).data
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return RecipeListSerializer(instance, context=context).data
 
 
 class ShoppingListSerializer(serializers.ModelSerializer):
@@ -278,7 +279,7 @@ class ShoppingListSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    """Сериализатор для избраного."""
+    """Сериализатор для избранного."""
 
     class Meta:
         model = Favorite

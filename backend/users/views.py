@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api.paginations import CustomPageNumberPagination
 from api.serializers import CustomUserSerializer, FollowSerializer
 
 from .models import Follow
@@ -21,27 +22,17 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    @action(detail=False, methods=['get', 'patch'],
-            permission_classes=[IsAuthenticated])
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
     def me(self, request):
-        """Запрос информации пользователя о себе, редактирование профиля
-         пользователя."""
+        """Запрос информации пользователя о себе."""
 
-        user = request.user
-        if request.method == 'GET':
-            serializer = CustomUserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        if request.method == 'PATCH':
-            serializer = CustomUserSerializer(
-                user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        context = {'request': request}
+        serializer = CustomUserSerializer(request.user, context=context)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class FollowViewSet(APIView):
@@ -49,7 +40,7 @@ class FollowViewSet(APIView):
 
     serializer_class = FollowSerializer
     permission_classes = [IsAuthenticated]
-    # pagination_class = CustomPageNumberPagination
+    pagination_class = CustomPageNumberPagination
 
     def post(self, request, *args, **kwargs):
         """Добавление подписки на автора."""
@@ -101,7 +92,7 @@ class FollowListView(ListAPIView):
 
     serializer_class = FollowSerializer
     permission_classes = [IsAuthenticated]
-    # pagination_class = CustomPageNumberPagination
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         return User.objects.filter(following__user=self.request.user)

@@ -151,7 +151,7 @@ class AddIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
-    """Сериализатор для отображения рецептов."""
+    """Сериализатор для списка рецептов."""
 
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
@@ -172,7 +172,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Favorite.objects.filter(recipe=obj, user=request.user).data
+        return Favorite.objects.filter(recipe=obj, user=request.user).exists()
 
     def get_is_in_shopping_list(self, obj):
         request = self.context.get('request')
@@ -181,11 +181,11 @@ class RecipeListSerializer(serializers.ModelSerializer):
         return ShoppingList.objects.filter(
             recipe=obj,
             user=request.user
-        ).data
+        ).exists()
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления и обновления рецептов."""
+    """Сериализатор для добавления и обновления рецепта."""
 
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
@@ -228,32 +228,31 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'cooking_time': 'Время приготовления должно быть больше 0.'}
             )
+        return data
 
     @staticmethod
     def create_ingredients(recipe, ingredients):
-        bulk_list = [IngredientAmount(
+        ingredients_list = [IngredientAmount(
             recipe=recipe,
             ingredient=ing['id'],
             amount=ing['amount']
         ) for ing in ingredients]
-        IngredientAmount.objects.bulk_create(bulk_list)
-
-    @staticmethod
-    def create_tags(recipe, tags):
-        for tag in tags:
-            recipe.tags.add(tag)
+        IngredientAmount.objects.bulk_create(ingredients_list)
 
     def create(self, validated_data):
         author = self.context.get('request').user
+        tags_data = validated_data.pop('tags')
+        ingredients_data = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=author, **validated_data)
-        self.create_tags(recipe, validated_data.pop('tags'))
-        self.create_ingredients(recipe, validated_data.pop('ingredients'))
+        recipe.save()
+        recipe.tags.set(tags_data)
+        self.create_ingredients(recipe, ingredients_data)
         return recipe
 
     def update(self, recipe, validated_data):
         recipe.tags.clear()
         IngredientAmount.objects.filter(recipe=recipe).delete()
-        self.create_tags(recipe, validated_data.pop('tags'))
+        recipe.tags.set(validated_data.pop('tags'))
         self.create_ingredients(recipe, validated_data.pop('ingredients'))
         return super().update(recipe, validated_data)
 
@@ -283,7 +282,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
-        fields = 'users', 'recipe',
+        fields = 'user', 'recipe',
 
     def validate(self, data):
         request = self.context.get('request')

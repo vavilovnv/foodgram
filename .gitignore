@@ -132,4 +132,6 @@ dmypy.json
 .idea
 
 migrations/
-
+/frontend
+/backend/backend_media/
+/backend/backend_static/

@@ -1,12 +1,18 @@
+from datetime import date
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from recipes.models import Ingredient, Favorite, Recipe, ShoppingCart, Tag
+from recipes.models import (Ingredient, IngredientAmount, Favorite, Recipe,
+                            ShoppingCart, Tag)
 
 from .filters import IngredientSearchFilter, RecipeFilter
 from .paginations import CustomPageNumberPagination
@@ -105,3 +111,64 @@ class RecipesViewSet(ModelViewSet):
             pk=pk
         )
 
+    @action(
+        detail=False,
+        methods=['GET'],
+        permission_classes=[IsAuthenticated]
+    )
+    def download_shopping_cart(self, request):
+        height_page, string_interval, text_indent = 750, 15, 100
+        fonts_size = {
+            'small': 10,
+            'normal': 12,
+            'huge': 18
+        }
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = (
+            'attachment;',
+            'filename="shopping_list.pdf"'
+        )
+        pdfmetrics.registerFont(
+            TTFont('arial', '../data/arial.ttf', 'UTF-8')
+        )
+        page = canvas.Canvas(response)
+        page.setFont('arial', fonts_size['huge'])
+        page.drawString(
+            text_indent - 30,
+            height_page,
+            'Список ингредиентов для покупки:'
+        )
+        height_page -= string_interval * 2
+        page.setFont('arial', size=fonts_size['normal'])
+        ingredients = IngredientAmount.objects.filter(
+            recipe__shopping_carts__user=request.user
+        ).values_list(
+            'ingredient__name',
+            'ingredient__measurement_unit',
+            'amount'
+        )
+        cart_list = {}
+        for ingredient in ingredients:
+            name, measure, amount = ingredient
+            if name in cart_list:
+                cart_list[name]['amount'] += amount
+            else:
+                cart_list[name] = {
+                    'unit': measure,
+                    'amount': amount
+                }
+        for idx, (name, data) in enumerate(cart_list.items(), 1):
+            description = f'{idx}. {name} - {data["amount"]} {data["unit"]}'
+            page.drawString(text_indent, height_page, description)
+            height_page -= string_interval
+        page.setLineWidth(1)
+        page.line(text_indent, height_page + 10, text_indent + 200, height_page + 10)
+        page.setFont('arial', fonts_size['small'])
+        page.drawString(
+            text_indent,
+            height_page,
+            f'{date.today()} Foodgram project (c)'
+        )
+        page.showPage()
+        page.save()
+        return response

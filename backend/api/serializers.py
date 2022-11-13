@@ -97,6 +97,7 @@ class FollowSerializer(CustomUserSerializer):
     def get_amount_recipes(obj):
         return obj.recipes.count()
 
+
 class RecipeInfoSerializer(serializers.ModelSerializer):
     """Сериализатор с краткой информацией о рецепте."""
 

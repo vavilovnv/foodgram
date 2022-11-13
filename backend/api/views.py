@@ -1,7 +1,10 @@
 from datetime import date
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingCart, Tag)
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -11,14 +14,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from recipes.models import (Ingredient, IngredientAmount, Favorite, Recipe,
-                            ShoppingCart, Tag)
-
 from .filters import IngredientSearchFilter, RecipeFilter
 from .paginations import CustomPageNumberPagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeSerializer,
-                          FavoriteSerializer, RecipeListSerializer,
+from .serializers import (FavoriteSerializer, IngredientSerializer,
+                          RecipeListSerializer, RecipeSerializer,
                           ShoppingCartSerializer, TagSerializer)
 
 
@@ -164,7 +164,12 @@ class RecipesViewSet(ModelViewSet):
             page.drawString(text_indent, height_page, description)
             height_page -= string_interval
         page.setLineWidth(1)
-        page.line(text_indent, height_page + 10, text_indent + 150, height_page + 10)
+        page.line(
+            text_indent,
+            height_page + 10,
+            text_indent + 150,
+            height_page + 10
+        )
         page.setFont('arial', fonts_size['small'])
         page.drawString(
             text_indent,

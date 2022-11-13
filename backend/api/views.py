@@ -150,6 +150,7 @@ class RecipesViewSet(ModelViewSet):
         cart_list = {}
         for ingredient in ingredients:
             name, measure, amount = ingredient
+            name = name.capitalize()
             if name in cart_list:
                 cart_list[name]['amount'] += amount
             else:
@@ -158,11 +159,11 @@ class RecipesViewSet(ModelViewSet):
                     'amount': amount
                 }
         for idx, (name, data) in enumerate(cart_list.items(), 1):
-            description = f'{idx}. {name} - {data["amount"]} {data["unit"]}'
+            description = f'{idx}. {name} ({data["unit"]}) - {data["amount"]}'
             page.drawString(text_indent, height_page, description)
             height_page -= string_interval
         page.setLineWidth(1)
-        page.line(text_indent, height_page + 10, text_indent + 200, height_page + 10)
+        page.line(text_indent, height_page + 10, text_indent + 150, height_page + 10)
         page.setFont('arial', fonts_size['small'])
         page.drawString(
             text_indent,

@@ -6,14 +6,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from recipes.models import Ingredient, Favorite, Recipe, ShoppingList, Tag
+from recipes.models import Ingredient, Favorite, Recipe, ShoppingCart, Tag
 
 from .filters import IngredientSearchFilter, RecipeFilter
 from .paginations import CustomPageNumberPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           FavoriteSerializer, RecipeListSerializer,
-                          ShoppingListSerializer, TagSerializer)
+                          ShoppingCartSerializer, TagSerializer)
 
 
 class TagsViewSet(ReadOnlyModelViewSet):
@@ -51,7 +51,7 @@ class RecipesViewSet(ModelViewSet):
         return RecipeSerializer
 
     @staticmethod
-    def post_method_for_actions(request, pk, serializers):
+    def post_method(request, pk, serializers):
         data = {'user': request.user.id, 'recipe': pk}
         serializer = serializers(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -59,7 +59,7 @@ class RecipesViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @staticmethod
-    def delete_method_for_actions(request, model, pk):
+    def delete_method(request, model, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         obj = get_object_or_404(model, user=request.user, recipe=recipe)
         obj.delete()
@@ -71,7 +71,7 @@ class RecipesViewSet(ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def favorite(self, request, pk):
-        return self.post_method_for_actions(
+        return self.post_method(
             request=request,
             pk=pk,
             serializers=FavoriteSerializer
@@ -79,7 +79,7 @@ class RecipesViewSet(ModelViewSet):
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        return self.delete_method_for_actions(
+        return self.delete_method(
             request=request,
             model=Favorite,
             pk=pk
@@ -90,17 +90,18 @@ class RecipesViewSet(ModelViewSet):
         methods=['POST'],
         permission_classes=[IsAuthenticated]
     )
-    def shopping_list(self, request, pk):
-        return self.post_method_for_actions(
+    def shopping_cart(self, request, pk):
+        return self.post_method(
             request=request,
             pk=pk,
-            serializers=ShoppingListSerializer
+            serializers=ShoppingCartSerializer
         )
 
-    @shopping_list.mapping.delete
-    def delete_favorite(self, request, pk):
-        return self.delete_method_for_actions(
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, pk):
+        return self.delete_method(
             request=request,
-            model=ShoppingList,
+            model=ShoppingCart,
             pk=pk
         )
+

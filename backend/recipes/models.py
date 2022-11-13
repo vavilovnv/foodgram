@@ -175,19 +175,19 @@ class Favorite(models.Model):
         )
 
 
-class ShoppingList(models.Model):
+class ShoppingCart(models.Model):
     """Класс описывающий список покупок."""
 
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_lists',
+        related_name='shopping_carts',
         verbose_name='Рецепт',
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user_lists',
+        related_name='shopping_carts',
         verbose_name='Пользователь',
     )
 
@@ -197,6 +197,6 @@ class ShoppingList(models.Model):
         constraints = (
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
-                name='unique shopping list'
+                name='unique shopping carts'
             ),
         )

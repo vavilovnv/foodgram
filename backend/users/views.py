@@ -1,5 +1,3 @@
-from api.paginations import CustomPageNumberPagination
-from api.serializers import CustomUserSerializer, FollowSerializer
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework import status
@@ -9,6 +7,9 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from api.paginations import CustomPageNumberPagination
+from api.serializers import CustomUserSerializer, FollowSerializer
 
 from .models import Follow
 
@@ -53,10 +54,11 @@ class FollowViewSet(APIView):
                 {'error': 'Нельзя подписаться на самого себя.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if Follow.objects.filter(
-                user=self_user,
-                author_id=author_id
-        ).exists():
+        obj, created = Follow.objects.get_or_create(
+            user=self_user,
+            author_id=author_id
+        )
+        if not created:
             return Response(
                 {'error': 'Подписка уже оформлена.'},
                 status=status.HTTP_400_BAD_REQUEST

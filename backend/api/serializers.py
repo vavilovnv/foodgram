@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
+
 from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
                             ShoppingCart, Tag)
-from rest_framework import serializers
 from users.models import Follow
 
 User = get_user_model()
@@ -203,28 +205,27 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
 
+    @staticmethod
+    def __check_len(name, lst):
+        value = {'tags': 'Теги', 'ingredients': 'Ингредиенты'}
+        if len(set(lst)) < len(lst):
+            raise serializers.ValidationError(
+                {'name': f'{value[name]} должны быть уникальными.'}
+            )
+
     def validate(self, data):
-        tags, tags_list, ingredients_list = data['tags'], [], []
+        tags = data['tags']
         if not tags:
             raise serializers.ValidationError(
                 {'tags': 'Выберите хотя бы один тег.'}
             )
-        for tag in tags:
-            if tag is tags_list:
-                raise serializers.ValidationError(
-                    {'tags': 'Теги должны быть уникальными.'}
-                )
-            tags_list.append(tag)
-        for ingredient in data['ingredients']:
-            if ingredient['id'] in ingredients_list:
-                raise serializers.ValidationError(
-                    {'ingredients': 'Ингредиенты должны быть уникальны.'}
-                )
-            ingredients_list.append(ingredient['id'])
-            if int(ingredient['amount']) <= 0:
-                raise serializers.ValidationError(
-                    {'amount': 'Количество ингредиента должно быть больше 0.'}
-                )
+        self.__check_len('tags', tags)
+        ingredients_id = [i['id'] for i in data['ingredients']]
+        self.__check_len('ingredients', ingredients_id)
+        if any([int(i['amount']) <= 0 for i in data['ingredients']]):
+            raise serializers.ValidationError(
+                {'amount': 'Количество ингредиента должно быть больше 0.'}
+            )
         if int(data['cooking_time']) <= 0:
             raise serializers.ValidationError(
                 {'cooking_time': 'Время приготовления должно быть больше 0.'}
@@ -269,19 +270,13 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = 'recipe', 'user',
-
-    def validate(self, data):
-        request = self.context.get('request')
-        if not request or request.user.is_anonymous:
-            return False
-        if ShoppingCart.objects.filter(
-            recipe=data['recipe'],
-            user=request.user
-        ).exists():
-            raise serializers.ValidationError(
-                {'status': 'Рецепт уже добавлен в список покупок.'}
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShoppingCart.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже добавлен в список покупок.'
             )
-        return data
+        ]
 
     def to_representation(self, instance):
         request = self.context.get('request')
@@ -297,19 +292,13 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = 'user', 'recipe',
-
-    def validate(self, data):
-        request = self.context.get('request')
-        if not request or request.user.is_anonymous:
-            return False
-        if Favorite.objects.filter(
-            user=request.user,
-            recipe=data['recipe']
-        ).exists():
-            raise serializers.ValidationError(
-                {'status': 'Рецепт уже добавлен в избранное.'}
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже добавлен в избранное.'
             )
-        return data
+        ]
 
     def to_representation(self, instance):
         request = self.context.get('request')

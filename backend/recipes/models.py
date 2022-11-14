@@ -1,3 +1,4 @@
+from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -9,17 +10,17 @@ class Tag(models.Model):
     """Класс описывающий тег."""
 
     name = models.CharField(
+        'Название',
         max_length=200,
-        verbose_name='Название',
     )
-    color = models.CharField(
-        max_length=7,
-        verbose_name='Цвет в HEX',
+    color = ColorField(
+        'Цвет в HEX',
+        default='#ff0000',
     )
     slug = models.SlugField(
+        'Слаг',
         max_length=200,
         unique=True,
-        verbose_name='Слаг'
     )
 
     class Meta:
@@ -34,12 +35,12 @@ class Ingredient(models.Model):
     """Класс описывающий ингредиент."""
 
     name = models.CharField(
+        'Название',
         max_length=200,
-        verbose_name='Название',
     )
     measurement_unit = models.CharField(
+        'Единица измерения',
         max_length=200,
-        verbose_name='Единица измерения',
     )
 
     class Meta:
@@ -67,13 +68,12 @@ class Recipe(models.Model):
         verbose_name='Автор',
     )
     name = models.CharField(
+        'Название',
         max_length=200,
-        verbose_name='Название',
     )
     image = models.ImageField(
+        'Картинка',
         upload_to='recipes/images/',
-        verbose_name='Картинка',
-
     )
     text = models.TextField(
         'Описание',
@@ -90,17 +90,17 @@ class Recipe(models.Model):
         verbose_name='Теги',
     )
     cooking_time = models.PositiveSmallIntegerField(
+        'Время приготовления (мин.)',
         validators=(
             MinValueValidator(
                 1,
                 message='Время приготовления должно быть более минуты.'
             ),
         ),
-        verbose_name='Время приготовления',
     )
     pub_date = models.DateTimeField(
+        'Дата публикации',
         auto_now_add=True,
-        verbose_name='Время приготовления (мин.)',
     )
 
     class Meta:

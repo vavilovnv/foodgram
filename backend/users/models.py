@@ -9,22 +9,22 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     username = models.CharField(
+        'Имя пользователя',
         max_length=150,
         unique=True,
-        verbose_name='Имя пользователя',
     )
     first_name = models.CharField(
+        'Имя',
         max_length=150,
-        verbose_name='Имя',
     )
     last_name = models.CharField(
+        'Фамилия',
         max_length=150,
-        verbose_name='Фамилия',
     )
     email = models.EmailField(
+        'E-mail',
         max_length=254,
         unique=True,
-        verbose_name='E-mail',
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

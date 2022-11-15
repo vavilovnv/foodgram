@@ -213,23 +213,32 @@ class RecipeSerializer(serializers.ModelSerializer):
                 {'name': f'{value[name]} должны быть уникальными.'}
             )
 
-    def validate(self, data):
-        tags = data['tags']
+    def tags_validation(self, tags):
         if not tags:
             raise serializers.ValidationError(
                 {'tags': 'Выберите хотя бы один тег.'}
             )
         self.__check_len('tags', tags)
-        ingredients_id = [i['id'] for i in data['ingredients']]
+
+    def ingredient_validation(self, ingredients):
+        ingredients_id = [i['id'] for i in ingredients['ingredients']]
         self.__check_len('ingredients', ingredients_id)
-        if any([int(i['amount']) <= 0 for i in data['ingredients']]):
+        if any([int(i['amount']) <= 0 for i in ingredients]):
             raise serializers.ValidationError(
                 {'amount': 'Количество ингредиента должно быть больше 0.'}
             )
-        if int(data['cooking_time']) <= 0:
+
+    @staticmethod
+    def cooking_time_validation(cooking_time):
+        if int(cooking_time) <= 0:
             raise serializers.ValidationError(
                 {'cooking_time': 'Время приготовления должно быть больше 0.'}
             )
+
+    def validate(self, data):
+        self.tags_validation(data['tags'])
+        self.ingredient_validation(data['ingredients'])
+        self.cooking_time_validation(data['cooking_time'])
         return data
 
     @staticmethod

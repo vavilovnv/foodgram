@@ -1,6 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 
-from backend.settings import REST_FRAMEWORK
+from backend.settings import REST_FRAMEWORK  # isort:skip
 
 
 class CustomPageNumberPagination(PageNumberPagination):

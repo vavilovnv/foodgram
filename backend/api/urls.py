@@ -1,9 +1,11 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from users.views import CustomUserViewSet, FollowListView, FollowViewSet
+from users.views import (CustomUserViewSet, FollowListView,  # isort:skip
+                         FollowViewSet)  # isort:skip
 
-from .views import IngredientsViewSet, RecipesViewSet, TagsViewSet
+from .views import (IngredientsViewSet, RecipesViewSet,  # isort:skip
+                    TagsViewSet)  # isort:skip
 
 router = DefaultRouter()
 router.register('users', CustomUserViewSet, basename='users')

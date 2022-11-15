@@ -1,9 +1,9 @@
 import csv
-
-from django.core.management.base import BaseCommand, CommandError
 from os import path
 
-from recipes.models import Ingredient
+from django.core.management.base import BaseCommand, CommandError
+
+from recipes.models import Ingredient  # isort:skip
 
 
 class Command(BaseCommand):

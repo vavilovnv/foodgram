@@ -12,15 +12,18 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                            ShoppingCart, Tag)
+from recipes.models import (Favorite, Ingredient,  # isort:skip
+                            IngredientAmount, Recipe,  # isort:skip
+                            ShoppingCart, Tag)  # isort:skip
 
-from .filters import IngredientSearchFilter, RecipeFilter
-from .paginations import CustomPageNumberPagination
-from .permissions import IsAuthorOrReadOnly
-from .serializers import (FavoriteSerializer, IngredientSerializer,
-                          RecipeListSerializer, RecipeSerializer,
-                          ShoppingCartSerializer, TagSerializer)
+from .filters import IngredientSearchFilter, RecipeFilter  # isort:skip
+from .paginations import CustomPageNumberPagination  # isort:skip
+from .permissions import IsAuthorOrReadOnly  # isort:skip
+from .serializers import (FavoriteSerializer,  # isort:skip
+                          IngredientSerializer,  # isort:skip
+                          RecipeListSerializer,
+                          RecipeSerializer,  # isort:skip
+                          ShoppingCartSerializer, TagSerializer)  # isort:skip
 
 
 class TagsViewSet(ReadOnlyModelViewSet):

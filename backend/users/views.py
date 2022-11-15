@@ -68,7 +68,7 @@ class FollowViewSet(APIView):
         return Response(
             self.serializer_class(author, context=context).data,
             status=status.HTTP_201_CREATED
-            )
+        )
 
     def delete(self, request, *args, **kwargs):
         """Удаление подписки на автора."""

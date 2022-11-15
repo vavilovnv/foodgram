@@ -4,9 +4,10 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                            ShoppingCart, Tag)
-from users.models import Follow
+from recipes.models import (Favorite, Ingredient,  # isort:skip
+                            IngredientAmount, Recipe,  # isort:skip
+                            ShoppingCart, Tag)  # isort:skip
+from users.models import Follow  # isort:skip
 
 User = get_user_model()
 

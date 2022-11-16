@@ -12,7 +12,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        filename = path.join('..', 'data', 'ingredients.csv')
+        filename = path.join('.', 'data', 'ingredients.csv')
         try:
             with open(filename, 'r', encoding='UTF-8') as file:
                 data = csv.reader(file)

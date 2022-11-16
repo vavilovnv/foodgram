@@ -134,7 +134,7 @@ class RecipesViewSet(ModelViewSet):
             'filename="shopping_list.pdf"'
         )
         pdfmetrics.registerFont(
-            TTFont('arial', '../data/arial.ttf', 'UTF-8')
+            TTFont('arial', './data/arial.ttf', 'UTF-8')
         )
         page = canvas.Canvas(response)
         page.setFont('arial', fonts_size['huge'])

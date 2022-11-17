@@ -23,6 +23,7 @@ class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = CustomPageNumberPagination
 
     @action(
         detail=False,
@@ -64,7 +65,6 @@ class FollowViewSet(APIView):
                 {'error': 'Подписка уже оформлена.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        Follow.objects.create(user=self_user, author_id=author_id)
         context = {'request': request}
         return Response(
             self.serializer_class(author, context=context).data,

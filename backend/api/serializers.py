@@ -140,7 +140,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientAmount
-        fields = 'id', 'name', 'amount', 'measurement_unit'
+        fields = 'id', 'name', 'measurement_unit', 'amount',
 
 
 class AddIngredientSerializer(serializers.ModelSerializer):
@@ -157,22 +157,24 @@ class AddIngredientSerializer(serializers.ModelSerializer):
 class RecipeListSerializer(serializers.ModelSerializer):
     """Сериализатор для списка рецептов."""
 
+    tags = TagSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
-    tags = TagSerializer(read_only=True, many=True)
     ingredients = serializers.SerializerMethodField(read_only=True)
-    is_favorite = serializers.SerializerMethodField(read_only=True)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
+                  'is_in_shopping_cart', 'name', 'image', 'text',
+                  'cooking_time')
 
     @staticmethod
     def get_ingredients(obj):
         queryset = IngredientAmount.objects.filter(recipe=obj)
         return IngredientAmountSerializer(queryset, many=True).data
 
-    def get_is_favorite(self, obj):
+    def get_is_favorited(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
@@ -222,7 +224,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         self.__check_len('tags', tags)
 
     def ingredient_validation(self, ingredients):
-        ingredients_id = [i['id'] for i in ingredients['ingredients']]
+        ingredients_id = [i['id'] for i in ingredients]
         self.__check_len('ingredients', ingredients_id)
         if any([int(i['amount']) <= 0 for i in ingredients]):
             raise serializers.ValidationError(

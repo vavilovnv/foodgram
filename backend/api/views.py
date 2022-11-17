@@ -123,6 +123,7 @@ class RecipesViewSet(ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
+        filename = 'shopping_list.pdf'
         height_page, string_interval, text_indent = 750, 15, 100
         fonts_size = {
             'small': 10,
@@ -130,7 +131,7 @@ class RecipesViewSet(ModelViewSet):
             'huge': 18
         }
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename=shopping_list.pdf'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
         pdfmetrics.registerFont(
             TTFont('arial', './data/arial.ttf', 'UTF-8')
         )

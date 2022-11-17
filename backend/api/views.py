@@ -130,10 +130,7 @@ class RecipesViewSet(ModelViewSet):
             'huge': 18
         }
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = (
-            'attachment;',
-            'filename="shopping_list.pdf"'
-        )
+        response['Content-Disposition'] = f'attachment; filename=shopping_list.pdf'
         pdfmetrics.registerFont(
             TTFont('arial', './data/arial.ttf', 'UTF-8')
         )
@@ -179,7 +176,7 @@ class RecipesViewSet(ModelViewSet):
         page.drawString(
             text_indent,
             height_page,
-            f'{date.today()} Foodgram project (c)'
+            f'Foodgram project (c) {date.today().year}'
         )
         page.showPage()
         page.save()

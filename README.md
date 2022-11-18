@@ -65,7 +65,8 @@ pip install -r requirements.txt
 ```
 python manage.py makemigrations
 
-# в случае, если файлы миграций не формируются командой выше, запустить команду последовательно с указанием имен приложений users и recipes в формате
+# в случае, если файлы миграций не формируются командой выше, запустить команду
+# последовательно с указанием имен приложений users и recipes в следующем формате
 python manage.py makemigrations [имя приложения]
 
 python manage.py migrate
@@ -131,7 +132,8 @@ sudo docker-compose up -d --build
 ```
 sudo docker-compose exec backend python manage.py makemigrations
 
-# в случае, если файлы миграций не формируются командой выше, запустить команду последовательно с указанием имен приложений users и recipes в формате
+# в случае, если файлы миграций не формируются командой выше, запустить команду
+# последовательно с указанием имен приложений users и recipes в следующем формате
 sudo docker-compose exec backend python manage.py makemigrations [имя приложения]
 ```
 
@@ -162,10 +164,6 @@ sudo docker-compose exec backend python manage.py collectstatic
 
 ## Эндпоинты API
 Все эндпоинты API можно получить по адресу: [http://51.250.46.139/)/api/](http://51.250.46.139/api/)
-
-
-## Документация к API
-Документация к API создана при помощи redoc и доступна по адресу: [http://51.250.46.139/)/api/docs/](http://51.250.46.139/)/api/docs/)
 
 
 ## Технологическй стек

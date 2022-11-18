@@ -159,11 +159,11 @@ sudo docker-compose exec backend python manage.py collectstatic
 
 
 ## Сайт проекта
-Сайт проекта доступен по адресу: [http://51.250.46.139/](http://51.250.46.139/)
+Сайт проекта доступен по адресу: [http://foodgrams.ddns.net](http://foodgrams.ddns.net)
 
 
 ## Эндпоинты API
-Все эндпоинты API можно получить по адресу: [http://51.250.46.139/)/api/](http://51.250.46.139/api/)
+Все эндпоинты API можно получить по адресу: [http://foodgrams.ddns.net/api/](http://foodgrams.ddns.net/api/)
 
 
 ## Технологическй стек
@@ -180,7 +180,5 @@ sudo docker-compose exec backend python manage.py collectstatic
 
 ## Авторы
 
-Фронт - [Яндекс.Практикум](https://github.com/yandex-praktikum) 
-
-Бэк и деплой - [vavilovnv](https://github.com/vavilovnv)
+Фронт - [Яндекс.Практикум](https://github.com/yandex-praktikum), бэкенд и деплой - [vavilovnv](https://github.com/vavilovnv)
 

@@ -22,7 +22,7 @@ services:
       - ./.env
 
   frontend:
-    image: vavilovnv/foodgram_frontend:v1
+    image: vavilovnv/foodgram_frontend:v1_01
     volumes:
       - ../frontend/:/app/result_build/
 

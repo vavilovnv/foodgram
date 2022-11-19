@@ -239,7 +239,7 @@ class Api {
         method: 'GET',
         headers: {
           ...this._headers,
-          'authorization': `Token ${token}`
+          // 'authorization': `Token ${token}`
         }
       }
     ).then(this.checkResponse)

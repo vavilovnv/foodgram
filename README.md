@@ -162,13 +162,6 @@ sudo docker-compose exec backend python manage.py collectstatic
 Сайт проекта доступен по адресу: [http://foodgrams.ddns.net](http://foodgrams.ddns.net)
 
 
-## Доступ к админке
-Доступ к панели администрирования можно получить по адресу: [http://foodgrams.ddns.net/admin/](http://foodgrams.ddns.net/admin/)
-
-Логин: `admin@ya.ru`
-
-Пароль: `foodgram`
-
 
 ## Технологическй стек
 

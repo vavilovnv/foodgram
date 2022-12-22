@@ -24,12 +24,19 @@ class TagAdmin(admin.ModelAdmin):
     empty_value_display = 'пусто'
 
 
+class IngredientAmountInLine(admin.StackedInline):
+    model = IngredientAmount
+    extra = 4
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'author', 'amount_ingredients', 'amount_tags',
+    list_display_links = 'id', 'name',
     list_filter = 'name', 'author', 'tags',
     search_fields = 'name',
     empty_value_display = 'пусто'
+    inlines = [IngredientAmountInLine]
 
     @staticmethod
     def amount_ingredients(obj):

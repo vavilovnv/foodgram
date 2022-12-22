@@ -69,7 +69,7 @@ class FollowSerializer(CustomUserSerializer):
     """Сериализатор описывающий подписки пользователя на авторов рецептов."""
 
     recipes = serializers.SerializerMethodField(read_only=True)
-    amount_recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -78,11 +78,10 @@ class FollowSerializer(CustomUserSerializer):
             'username',
             'first_name',
             'last_name',
-            'password',
             'email',
             'is_subscribed',
             'recipes',
-            'amount_recipes',
+            'recipes_count',
         )
 
     def get_recipes(self, obj):
@@ -94,7 +93,7 @@ class FollowSerializer(CustomUserSerializer):
         return RecipeInfoSerializer(recipes, many=True).data
 
     @staticmethod
-    def get_amount_recipes(obj):
+    def get_recipes_count(obj):
         return obj.recipes.count()
 
 
